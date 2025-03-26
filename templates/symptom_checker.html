@@ -1,0 +1,9 @@
+<h2>Symptom Checker</h2>
+<form method="POST">
+    Symptom: <input type="text" name="symptom" required>
+    <button type="submit">Check Advice</button>
+</form>
+
+{% if advice %}
+    <p><strong>Advice:</strong> {{ advice }}</p>
+{% endif %}
