@@ -1,0 +1,460 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Diet Plan</title>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --text-color: #333333;
+            --light-text: #f8f9fa;
+            --background: #f8f9fa;
+            --container-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--light-text);
+            padding: 25px 0;
+            position: relative;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 15px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.2), rgba(63, 55, 201, 0.2));
+            border-radius: 0 0 10px 10px;
+        }
+
+        section {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
+        }
+
+        .form-section {
+            background: var(--container-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--background);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--light-text);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .diet-results {
+            background: var(--container-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            color: var(--light-text);
+            padding: 20px 30px;
+            position: relative;
+        }
+
+        .results-header h2 {
+            color: var(--light-text);
+            margin-bottom: 0;
+        }
+
+        .results-header h2::after {
+            display: none;
+        }
+
+        .results-content {
+            padding: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            position: relative;
+        }
+
+        th:first-child, td:first-child {
+            width: 30%;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+
+        .note {
+            margin-top: 25px;
+            padding: 15px 20px;
+            background-color: rgba(76, 201, 240, 0.1);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group, .results-content {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 0 10px;
+            }
+
+            header {
+                padding: 20px 0;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-section, .results-content {
+                padding: 20px;
+            }
+
+            th, td {
+                padding: 12px 10px;
+            }
+        }
+
+        /* Small screen adjustments */
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            .form-section, .results-content {
+                padding: 15px;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Add these styles */
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn i {
+            margin-right: 5px;
+        }
+
+        /* Add these styles to your existing CSS */
+        textarea.form-control {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--background);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            outline: none;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea.form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/dashboard" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+        <div class="container">
+            <h1>Maternity Care Portal</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section>
+            <h2>Customize Your Pregnancy Diet Plan</h2>
+            
+            <div class="form-section">
+                <form method="POST" id="dietForm">
+                    <div class="form-group">
+                        <label for="region">Select Your Region:</label>
+                        <select id="region" name="region" required>
+                            {% for r in regions %}
+                                <option value="{{ r }}" {% if r == selected_region %}selected{% endif %}>{{ r }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="trimester">Select Trimester:</label>
+                        <select id="trimester" name="trimester" required>
+                            {% for t in trimesters %}
+                                <option value="{{ t }}" {% if t == selected_trimester %}selected{% endif %}>{{ t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lmp_date">Last Menstrual Period Date:</label>
+                        <input type="date" id="lmp_date" name="lmp_date" required 
+                               value="{{ lmp_date if lmp_date else '' }}"
+                               max="{{ today_date }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="diet_preference">Dietary Preference:</label>
+                        <select id="diet_preference" name="diet_preference" required>
+                            {% for d in diet_preferences %}
+                                <option value="{{ d }}" {% if d == selected_diet %}selected{% endif %}>{{ d }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="health_conditions">Health Conditions (if any):</label>
+                        <textarea id="health_conditions" 
+                                name="health_conditions" 
+                                rows="3" 
+                                placeholder="Please enter any health conditions or concerns (e.g., gestational diabetes, hypertension, anemia, etc.). If none, leave blank or type 'None'."
+                                class="form-control">{{ selected_conditions if selected_conditions else '' }}</textarea>
+                        <small class="form-text text-muted">Separate multiple conditions with commas</small>
+                    </div>
+
+                    <button type="submit">Generate Personalized Diet Plan</button>
+                </form>
+            </div>
+        </section>
+
+        {% if selected_plan %}
+        <section class="diet-results">
+            <div class="results-header">
+                <h2>Your Personalized Indian Diet Plan</h2>
+            </div>
+            <div class="results-content">
+                {{ selected_plan | safe | replace('\n', '<br>') }}
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <script>
+        // Add some dynamic behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate form selections
+            const selects = document.querySelectorAll('select');
+            
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    this.style.borderColor = 'var(--primary-color)';
+                    setTimeout(() => {
+                        this.style.borderColor = 'var(--border-color)';
+                    }, 500);
+                });
+            });
+            
+            // Add submit animation
+            const form = document.getElementById('dietForm');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    const button = this.querySelector('button');
+                    button.textContent = 'Generating...';
+                    button.style.opacity = '0.8';
+                });
+            }
+            
+            // Smooth scroll to results if they exist
+            const results = document.querySelector('.diet-results');
+            if (results) {
+                setTimeout(() => {
+                    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

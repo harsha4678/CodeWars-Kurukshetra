@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to MomCare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Welcome to MomCare</h1>
+            <p>Your complete pregnancy healthcare companion</p>
+            
+            <div class="auth-buttons">
+                <a href="{{ url_for('login') }}" class="btn btn-login">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-register">Register</a>
+            </div>
+
+            <div class="back-to-landing">
+                <a href="{{ url_for('landing') }}">← Back to Landing Page</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
