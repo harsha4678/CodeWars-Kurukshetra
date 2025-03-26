@@ -1,0 +1,42 @@
+:root {
+    /* Light theme variables */
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #333;
+    --text-secondary: #666;
+    --border-color: #e0e0e0;
+}
+
+:root[data-theme="dark"] {
+    /* Dark theme variables */
+    --bg-color: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-color: #fff;
+    --text-secondary: #ccc;
+    --border-color: #404040;
+}
+
+/* Theme color variables */
+:root[data-color="blue"] {
+    --theme-color: #4361ee;
+    --theme-color-light: #6b88ff;
+    --theme-color-dark: #3f37c9;
+}
+
+:root[data-color="purple"] {
+    --theme-color: #7e57c2;
+    --theme-color-light: #b39ddb;
+    --theme-color-dark: #5e35b1;
+}
+
+:root[data-color="pink"] {
+    --theme-color: #ff6b9b;
+    --theme-color-light: #ff8fb3;
+    --theme-color-dark: #e6477e;
+}
+
+:root[data-color="green"] {
+    --theme-color: #2ecc71;
+    --theme-color-light: #87D37C;
+    --theme-color-dark: #27ae60;
+}

@@ -1,0 +1,119 @@
+:root {
+    --theme-color: #007bff;
+    --theme-hover: #0056b3;
+    --bg-color: #f8f9fa;
+    --text-color: #333;
+    --card-bg: #fff;
+}
+
+:root[data-theme="dark"] {
+    --background-color: #000000;
+    --text-color: #ffffff;
+    --card-bg: #1a1a1a;
+    --header-bg: #1a1a1a;
+    --border-color: #333333;
+    --card-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.btn-primary {
+    background-color: var(--theme-color);
+    border-color: var(--theme-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--theme-hover);
+    border-color: var(--theme-hover);
+}
+
+.card {
+    background-color: var(--card-bg);
+}
+
+.card, .settings-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.card-header, .settings-header {
+    background-color: var(--theme-color);
+    color: var(--header-text);
+    padding: 1rem;
+}
+
+/* Buttons */
+.btn {
+    background-color: var(--theme-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: var(--theme-hover);
+}
+
+/* Tables */
+table {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+tr:nth-child(even) {
+    background-color: var(--table-stripe);
+}
+
+/* Forms */
+input, select, textarea {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+/* Navigation */
+nav {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+}
+
+/* Links */
+a {
+    color: var(--link-color);
+}
+
+/* Basic color applications without changing layout */
+.dashboard-wrapper {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.dashboard-card {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.dashboard-header {
+    color: var(--text-color);
+}
+
+.top-nav {
+    background-color: var(--theme-color);
+}
+
+.btn, .dashboard-card-icon {
+    background-color: var(--theme-color);
+}
+
+.btn:hover {
+    background-color: var(--theme-hover);
+}

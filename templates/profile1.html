@@ -1,0 +1,830 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff6b9b;
+            --primary-light: #fff0f5;
+            --primary-dark: #e6477e;
+            --secondary-color: #6b88ff;
+            --text-color: #333333;
+            --text-light: #666666;
+            --background-color: #f8f9fd;
+            --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --danger-color: #F44336;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, var(--primary-light), #f0f8ff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            width: 90%;
+            max-width: 800px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background-image: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .header p {
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .form-container, .profile-view {
+            padding: 30px 40px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .form-section:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .section-header {
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-header i {
+            color: var(--primary-color);
+            font-size: 22px;
+            margin-right: 10px;
+        }
+
+        .section-header h3 {
+            color: var(--primary-dark);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e1e5ee;
+            border-radius: 8px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 15px;
+            transition: var(--transition);
+            background-color: #f8f9fd;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 155, 0.15);
+            outline: none;
+            background-color: white;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: "\f107";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            pointer-events: none;
+        }
+
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            padding-right: 30px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .col-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding: 0 10px;
+        }
+
+        @media (max-width: 768px) {
+            .col-6 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 13px 25px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 5px 15px rgba(230, 71, 126, 0.3);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 20px rgba(230, 71, 126, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        /* Profile view styles */
+        .profile-view {
+            display: none;
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-section h3 {
+            color: var(--primary-dark);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-section h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .profile-detail {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .detail-label {
+            width: 40%;
+            font-weight: 600;
+            color: var(--text-color);
+            padding-right: 15px;
+        }
+
+        .detail-value {
+            width: 60%;
+            color: var(--text-light);
+        }
+
+        @media (max-width: 576px) {
+            .detail-label, .detail-value {
+                width: 100%;
+            }
+            
+            .detail-value {
+                margin-top: 5px;
+                padding-left: 0;
+            }
+        }
+
+        .empty-value {
+            color: #aaa;
+            font-style: italic;
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background-color: var(--success-color);
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(150%);
+            transition: transform 0.5s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification i {
+            font-size: 20px;
+        }
+
+        /* Animation effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.3);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: white;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-message">Profile saved successfully!</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <button id="back-btn" class="back-btn" style="display: none;">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 id="header-title">Pregnancy Profile</h2>
+            <p id="header-subtitle">Please fill in your pregnancy details</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Form View -->
+        <div class="form-container" id="form-view">
+            <form id="pregnancy-form" action="/save_profile" method="post">
+                <!-- Personal Information Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-user"></i>
+                        <h3>Personal Information</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="full_name">Full Name</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" value="{{ profile.full_name }}" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="birth_date">Date of Birth</label>
+                                <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ profile.birth_date }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ profile.phone }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ profile.email }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregnancy Details Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-baby"></i>
+                        <h3>Pregnancy Details</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="due_date">Due Date</label>
+                                <input type="date" class="form-control" id="due_date" name="due_date" value="{{ profile.due_date }}" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="last_menstrual_period">Last Menstrual Period</label>
+                                <input type="date" class="form-control" id="last_menstrual_period" name="last_menstrual_period" value="{{ profile.last_menstrual_period }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="previous_pregnancies">Previous Pregnancies</label>
+                                <input type="number" class="form-control" id="previous_pregnancies" name="previous_pregnancies" min="0" value="{{ profile.previous_pregnancies }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="live_births">Live Births</label>
+                                <input type="number" class="form-control" id="live_births" name="live_births" min="0" value="{{ profile.live_births }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="miscarriages">Miscarriages</label>
+                        <input type="number" class="form-control" id="miscarriages" name="miscarriages" min="0" value="{{ profile.miscarriages }}">
+                    </div>
+                </div>
+
+                <!-- Medical Information Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3>Medical Information</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="doctor_name">Doctor Name</label>
+                                <input type="text" class="form-control" id="doctor_name" name="doctor_name" value="{{ profile.doctor_name }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="doctor_contact">Doctor Contact</label>
+                                <input type="text" class="form-control" id="doctor_contact" name="doctor_contact" value="{{ profile.doctor_contact }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="hospital_name">Hospital Name</label>
+                                <input type="text" class="form-control" id="hospital_name" name="hospital_name" value="{{ profile.hospital_name }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="hospital_contact">Hospital Contact</label>
+                                <input type="text" class="form-control" id="hospital_contact" name="hospital_contact" value="{{ profile.hospital_contact }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="blood_type">Blood Type</label>
+                                <div class="select-wrapper">
+                                    <select class="form-control" id="blood_type" name="blood_type">
+                                        <option value="">Select Blood Type</option>
+                                        <option value="A+" {% if profile.blood_type == 'A+' %}selected{% endif %}>A+</option>
+                                        <option value="A-" {% if profile.blood_type == 'A-' %}selected{% endif %}>A-</option>
+                                        <option value="B+" {% if profile.blood_type == 'B+' %}selected{% endif %}>B+</option>
+                                        <option value="B-" {% if profile.blood_type == 'B-' %}selected{% endif %}>B-</option>
+                                        <option value="O+" {% if profile.blood_type == 'O+' %}selected{% endif %}>O+</option>
+                                        <option value="O-" {% if profile.blood_type == 'O-' %}selected{% endif %}>O-</option>
+                                        <option value="AB+" {% if profile.blood_type == 'AB+' %}selected{% endif %}>AB+</option>
+                                        <option value="AB-" {% if profile.blood_type == 'AB-' %}selected{% endif %}>AB-</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="allergies">Allergies</label>
+                                <input type="text" class="form-control" id="allergies" name="allergies" value="{{ profile.allergies }}" placeholder="e.g., Penicillin, Nuts">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="medications">Current Medications</label>
+                        <input type="text" class="form-control" id="medications" name="medications" value="{{ profile.medications }}" placeholder="List any medications you're currently taking">
+                    </div>
+                    <div class="form-group">
+                        <label for="pre_existing_conditions">Pre-existing Conditions</label>
+                        <input type="text" class="form-control" id="pre_existing_conditions" name="pre_existing_conditions" value="{{ profile.pre_existing_conditions }}" placeholder="e.g., Diabetes, Hypertension">
+                    </div>
+                </div>
+
+                <!-- Health & Lifestyle Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-dumbbell"></i>
+                        <h3>Health & Lifestyle</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="weight">Weight (kg)</label>
+                                <input type="number" class="form-control" id="weight" name="weight" step="0.1" value="{{ profile.weight }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="height">Height (cm)</label>
+                                <input type="number" class="form-control" id="height" name="height" step="0.1" value="{{ profile.height }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="diet">Diet</label>
+                        <input type="text" class="form-control" id="diet" name="diet" value="{{ profile.diet }}" placeholder="e.g., Vegetarian, Regular">
+                    </div>
+                    <div class="form-group">
+                        <label for="exercise">Exercise Routine</label>
+                        <input type="text" class="form-control" id="exercise" name="exercise" value="{{ profile.exercise }}" placeholder="Describe your regular physical activities">
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="smoking_status">Smoking Status</label>
+                                <div class="select-wrapper">
+                                    <select class="form-control" id="smoking_status" name="smoking_status">
+                                        <option value="No" {% if profile.smoking_status == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Yes" {% if profile.smoking_status == 'Yes' %}selected{% endif %}>Yes</option>
+                                        <option value="Quit" {% if profile.smoking_status == 'Quit' %}selected{% endif %}>Quit</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="alcohol_consumption">Alcohol Consumption</label>
+                                <div class="select-wrapper">
+                                    <select class="form-control" id="alcohol_consumption" name="alcohol_consumption">
+                                        <option value="No" {% if profile.alcohol_consumption == 'No' %}selected{% endif %}>No</option>
+                                        <option value="Yes" {% if profile.alcohol_consumption == 'Yes' %}selected{% endif %}>Yes</option>
+                                        <option value="Occasional" {% if profile.alcohol_consumption == 'Occasional' %}selected{% endif %}>Occasional</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="caffeine_intake">Caffeine Intake</label>
+                        <input type="text" class="form-control" id="caffeine_intake" name="caffeine_intake" value="{{ profile.caffeine_intake }}" placeholder="e.g., 1 cup of coffee per day">
+                    </div>
+                </div>
+
+                <!-- Mental Wellbeing Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-brain"></i>
+                        <h3>Mental Wellbeing</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="stress_levels">Stress Levels</label>
+                        <div class="select-wrapper">
+                            <select class="form-control" id="stress_levels" name="stress_levels">
+                                <option value="Low" {% if profile.stress_levels == 'Low' %}selected{% endif %}>Low</option>
+                                <option value="Moderate" {% if profile.stress_levels == 'Moderate' %}selected{% endif %}>Moderate</option>
+                                <option value="High" {% if profile.stress_levels == 'High' %}selected{% endif %}>High</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="emotional_wellbeing">Emotional Wellbeing</label>
+                        <input type="text" class="form-control" id="emotional_wellbeing" name="emotional_wellbeing" value="{{ profile.emotional_wellbeing }}" placeholder="How have you been feeling emotionally?">
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Emergency Contacts</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="partner_name">Partner's Name</label>
+                                <input type="text" class="form-control" id="partner_name" name="partner_name" value="{{ profile.partner_name }}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="partner_contact">Partner's Contact</label>
+                                <input type="text" class="form-control" id="partner_contact" name="partner_contact" value="{{ profile.partner_contact }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="emergency_contact">Emergency Contact (Other than partner)</label>
+                        <input type="text" class="form-control" id="emergency_contact" name="emergency_contact" value="{{ profile.emergency_contact }}" placeholder="Name and phone number">
+                    </div>
+                </div>
+
+                <!-- Birth Plan Section -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>Birth Preferences</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="birth_preferences">Birth Preferences</label>
+                        <input type="text" class="form-control" id="birth_preferences" name="birth_preferences" value="{{ profile.birth_preferences }}" placeholder="e.g., Natural birth, Water birth, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label for="additional_notes">Additional Notes</label>
+                        <textarea class="form-control" id="additional_notes" name="additional_notes" rows="3" placeholder="Any other information you'd like to share">{{ profile.additional_notes }}</textarea>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Profile View (Will be shown after form submission) -->
+        <div class="profile-view" id="profile-view">
+            <!-- Personal Information Section -->
+            <div class="profile-section">
+                <h3><i class="fas fa-user"></i> Personal Information</h3>
+                <div class="profile-detail">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value" id="view-full_name"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Date of Birth</div>
+                    <div class="detail-value" id="view-birth_date"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value" id="view-phone"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Email Address</div>
+                    <div class="detail-value" id="view-email"></div>
+                </div>
+            </div>
+
+            <!-- Pregnancy Details Section -->
+            <div class="profile-section">
+                <h3><i class="fas fa-baby"></i> Pregnancy Details</h3>
+                <div class="profile-detail">
+                    <div class="detail-label">Due Date</div>
+                    <div class="detail-value" id="view-due_date"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Last Menstrual Period</div>
+                    <div class="detail-value" id="view-last_menstrual_period"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Previous Pregnancies</div>
+                    <div class="detail-value" id="view-previous_pregnancies"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Live Births</div>
+                    <div class="detail-value" id="view-live_births"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Miscarriages</div>
+                    <div class="detail-value" id="view-miscarriages"></div>
+                </div>
+            </div>
+
+            <!-- Medical Information Section -->
+            <div class="profile-section">
+                <h3><i class="fas fa-heartbeat"></i> Medical Information</h3>
+                <div class="profile-detail">
+                    <div class="detail-label">Doctor Name</div>
+                    <div class="detail-value" id="view-doctor_name"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Doctor Contact</div>
+                    <div class="detail-value" id="view-doctor_contact"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Hospital Name</div>
+                    <div class="detail-value" id="view-hospital_name"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Hospital Contact</div>
+                    <div class="detail-value" id="view-hospital_contact"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Blood Type</div>
+                    <div class="detail-value" id="view-blood_type"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Allergies</div>
+                    <div class="detail-value" id="view-allergies"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Current Medications</div>
+                    <div class="detail-value" id="view-medications"></div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Pre-existing Conditions</div>
+                    <div class="detail-value" id="view-pre_existing_conditions"></div>
+                </div>
+            <!-- Health & Lifestyle Section -->
+<div class="profile-section">
+    <h3><i class="fas fa-heart"></i> Health & Lifestyle</h3>
+    <div class="profile-detail">
+        <div class="detail-label">Weight</div>
+        <div class="detail-value" id="view-weight"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Height</div>
+        <div class="detail-value" id="view-height"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Diet</div>
+        <div class="detail-value" id="view-diet"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Exercise Routine</div>
+        <div class="detail-value" id="view-exercise"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Smoking Status</div>
+        <div class="detail-value" id="view-smoking_status"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Alcohol Consumption</div>
+        <div class="detail-value" id="view-alcohol_consumption"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Caffeine Intake</div>
+        <div class="detail-value" id="view-caffeine_intake"></div>
+    </div>
+</div>
+
+<!-- Mental Wellbeing Section -->
+<div class="profile-section">
+    <h3><i class="fas fa-smile"></i> Mental Wellbeing</h3>
+    <div class="profile-detail">
+        <div class="detail-label">Stress Levels</div>
+        <div class="detail-value" id="view-stress_levels"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Emotional Wellbeing</div>
+        <div class="detail-value" id="view-emotional_wellbeing"></div>
+    </div>
+</div>
+
+<!-- Emergency Contacts Section -->
+<div class="profile-section">
+    <h3><i class="fas fa-phone-alt"></i> Emergency Contacts</h3>
+    <div class="profile-detail">
+        <div class="detail-label">Partner's Name</div>
+        <div class="detail-value" id="view-partner_name"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Partner's Contact</div>
+        <div class="detail-value" id="view-partner_contact"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Emergency Contact</div>
+        <div class="detail-value" id="view-emergency_contact"></div>
+    </div>
+</div>
+
+<!-- Birth Plan Section -->
+<div class="profile-section">
+    <h3><i class="fas fa-baby"></i> Birth Plan</h3>
+    <div class="profile-detail">
+        <div class="detail-label">Birth Preferences</div>
+        <div class="detail-value" id="view-birth_preferences"></div>
+    </div>
+    <div class="profile-detail">
+        <div class="detail-label">Additional Notes</div>
+        <div class="detail-value" id="view-additional_notes"></div>
+    </div>
+</div>
+
+</body>
+</html>
+{% endblock %}

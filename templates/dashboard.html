@@ -1,17 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pregnancy Care Dashboard</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #2c7be5;
-            --secondary-color: #5e9ad9;
+            --primary-color: {{ theme_color|default('#2c7be5') }};
+            --secondary-color: {{ theme_color|default('#5e9ad9') }};
             --background-color: #f4f5f7;
             --text-color: #12263f;
             --card-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            --card-bg: white;
+            --header-bg: white;
+            --border-color: rgba(0,0,0,0.05);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: {{ theme_color|default('#ffffff') }};
+            --secondary-color: {{ theme_color|default('#cccccc') }};
+            --background-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: #1a1a1a;
+            --header-bg: #1a1a1a;
+            --border-color: #333333;
+            --card-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
         * {
@@ -25,6 +44,7 @@
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .dashboard-wrapper {
@@ -37,7 +57,98 @@
             padding: 40px;
             display: flex;
             flex-direction: column;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .branding {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .brand-name {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle, .profile-btn, .settings-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-toggle:hover, .profile-btn:hover, .settings-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .profile-btn {
+            position: relative;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            width: 200px;
+            z-index: 100;
+            padding: 10px 0;
+            display: none;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .profile-dropdown a {
+            display: block;
+            padding: 10px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .profile-dropdown a:hover {
+            background-color: var(--background-color);
         }
 
         .dashboard-header {
@@ -62,53 +173,95 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            flex-grow: 1;
         }
 
         .dashboard-card {
-            background-color: white;
+            background-color: var(--card-bg);
             border-radius: 12px;
             padding: 25px;
             text-align: center;
             text-decoration: none;
             transition: all 0.3s ease;
             box-shadow: var(--card-shadow);
-            border: 1px solid transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .dashboard-card:hover {
             transform: translateY(-5px);
             border-color: var(--primary-color);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
 
         .dashboard-card-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 15px;
             color: var(--primary-color);
+            height: 60px;
+            width: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(44, 123, 229, 0.1);
+            border-radius: 50%;
         }
 
         .dashboard-card-title {
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-color);
+            margin-bottom: 8px;
+        }
+
+        .dashboard-card p {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-top: 5px;
         }
 
         .image-section {
             flex: 1;
-            background-color: #f8f9fa;
+            /* Use the image as a background */
+            background-image: url("{{ url_for('static', filename='uploads/dashboard1.jpg') }}");
+            background-size: cover; /* Cover the entire section */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Prevent the image from repeating */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 40px;
             text-align: center;
+            color: white; /* Set a default text color for better visibility */
+            position: relative; /* Needed for the overlay */
+        }
+
+        /* Add an overlay to improve text readability */
+        .image-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Adjust the alpha value for darkness */
+            z-index: 1; /* Place the overlay behind the text */
+            border-radius: 15px; /* Match the image's border-radius */
+        }
+
+        .image-section * {
+            z-index: 2; /* Ensure text and other elements are above the overlay */
+            position: relative; /* Create a stacking context */
         }
 
         .image-section img {
-            max-width: 80%;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            /* Remove the image tag */
+            display: none;
         }
 
         .image-text {
@@ -117,13 +270,27 @@
         }
 
         .image-text h2 {
-            color: var(--primary-color);
+            color: white; /* Ensure the heading is white */
             margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a text shadow */
+        }
+
+        .image-text p {
+            color: white; /* Ensure the paragraph is white */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Add a text shadow */
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
         }
 
         .logout-btn {
             display: inline-block;
-            margin-top: 20px;
             background-color: var(--primary-color);
             color: white;
             padding: 10px 20px;
@@ -134,6 +301,11 @@
 
         .logout-btn:hover {
             background-color: var(--secondary-color);
+        }
+
+        .copyright {
+            color: var(--secondary-color);
+            font-size: 0.85rem;
         }
 
         @media (max-width: 1024px) {
@@ -154,61 +326,211 @@
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
+
+            .top-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="dashboard-wrapper">
         <div class="dashboard-content">
+            <div class="top-nav">
+                <div class="branding">
+                    <div class="logo"><i class="fas fa-heartbeat"></i></div>
+                    <div class="brand-name">MomCare</div>
+                </div>
+                <div class="user-controls">
+                    <button id="theme-toggle" class="theme-toggle" title="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+            
+                    <div class="profile-btn" title="Profile">
+                        <img src="{{ url_for('static', filename='uploads/woman.png') }}" alt="Profile" class="profile-img">
+                        <div id="profile-dropdown" class="profile-dropdown">
+                            
+
+                            <a href="{{ url_for('profile1') }}"><i class="fas fa-user"></i> My Profile</a>  
+                            <a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Account Settings</a>  
+                            <a href="{{ url_for('notifications') }}"><i class="fas fa-bell"></i> Notifications</a>  
+                            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Pregnancy Care Dashboard</h1>
                 <p class="dashboard-subtitle">Your Comprehensive Pregnancy Support Platform</p>
             </div>
 
             <div class="dashboard-grid">
+
+
+
+                <a href="{{ url_for('weight_gain_calculator') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">⚖️</div>
+                    <h3 class="dashboard-card-title">Weight Gain Calculator</h3>
+                    <p>Track healthy pregnancy weight gain</p>
+                </a>
+
+                <a href="{{ url_for('pregnancy') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">🤰</div>
+                    <h3 class="dashboard-card-title">Pregnancy Calculator</h3>
+                    <p>Track your due date and pregnancy milestones</p>
+                </a>
+
+
+                <a href="{{ url_for('exercises') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">🏋️‍♀️</div>
+                    <h3 class="dashboard-card-title">Pregnancy Exercises</h3>
+                    <p>Safe workouts for each trimester</p>
+                </a>
+
+                
+
                 <a href="{{ url_for('diet_plan') }}" class="dashboard-card">
                     <div class="dashboard-card-icon">🥗</div>
                     <h3 class="dashboard-card-title">Diet Plan</h3>
+                    <p>Nutritional guidance for a healthy pregnancy</p>
                 </a>
 
-                <a href="{{ url_for('records') }}" class="dashboard-card">
-                    <div class="dashboard-card-icon">📂</div>
-                    <h3 class="dashboard-card-title">Health Records</h3>
+
+                <a href="{{ url_for('book_appointment') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">📅</div>
+                    <h3 class="dashboard-card-title">Book Appointment</h3>
+                    <p>Schedule your next prenatal visit</p>
+                </a>
+
+
+                <a href="{{ url_for('appointments') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">👩‍⚕️</div>
+                    <h3 class="dashboard-card-title">View Appointments</h3>
+                    <p>Manage your scheduled appointments</p>
                 </a>
 
                 <a href="{{ url_for('upload_record') }}" class="dashboard-card">
                     <div class="dashboard-card-icon">📤</div>
                     <h3 class="dashboard-card-title">Upload Record</h3>
+                    <p>Securely add new medical documents</p>
+                </a>
+
+                <a href="{{ url_for('records') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">📂</div>
+                    <h3 class="dashboard-card-title">Health Records</h3>
+                    <p>Access and manage your medical history</p>
                 </a>
 
                 <a href="{{ url_for('symptom_checker') }}" class="dashboard-card">
                     <div class="dashboard-card-icon">🩺</div>
                     <h3 class="dashboard-card-title">Symptom Checker</h3>
+                    <p>Check common pregnancy symptoms</p>
                 </a>
 
-                <a href="{{ url_for('book_appointment') }}" class="dashboard-card">
-                    <div class="dashboard-card-icon">📅</div>
-                    <h3 class="dashboard-card-title">Book Appointment</h3>
-                </a>
+                
 
-                <a href="{{ url_for('appointments') }}" class="dashboard-card">
-                    <div class="dashboard-card-icon">👩‍⚕️</div>
-                    <h3 class="dashboard-card-title">View Appointments</h3>
-                </a>
+                
+
+                
+
             </div>
 
-            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            <div class="footer">
+                <div class="copyright">&copy; 2025 MomCare. All rights reserved.</div>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
         </div>
-    
-    
 
         <div class="image-section">
-            <img src="D:\Projects\PregnancyHealthCare\uploads\image.png" alt="Pregnancy Care" />
             <div class="image-text">
                 <h2>Your Journey, Our Support</h2>
                 <p>We're here to guide you through every step of your pregnancy, providing personalized care, expert advice, and comprehensive support to ensure both you and your baby's health and well-being.</p>
             </div>
         </div>
     </div>
+
+    <script>
+        // Replace the existing theme toggle code with this updated version
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const html = document.documentElement;
+        
+        // Initialize theme from localStorage
+        function initializeTheme() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                document.body.style.backgroundColor = '#000000';
+            } else {
+                html.removeAttribute('data-theme');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                document.body.style.backgroundColor = '#f4f5f7';
+            }
+        }
+        
+        // Handle theme toggle
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                html.removeAttribute('data-theme');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                document.body.style.backgroundColor = '#f4f5f7';
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                document.body.style.backgroundColor = '#000000';
+                localStorage.setItem('darkMode', 'true');
+            }
+        });
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initializeTheme);
+
+        // Profile dropdown toggle
+        const profileBtn = document.querySelector('.profile-btn');
+        const profileDropdown = document.getElementById('profile-dropdown');
+        
+        profileBtn.addEventListener('click', (e) => {
+            profileDropdown.classList.toggle('show');
+            e.stopPropagation();
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (profileDropdown.classList.contains('show') && !profileBtn.contains(e.target)) {
+                profileDropdown.classList.remove('show');
+            }
+        });
+
+        // Add this after existing theme toggle code
+        document.addEventListener('DOMContentLoaded', function() {
+            // Apply saved color preference
+            const savedColor = localStorage.getItem('themeColor');
+            if (savedColor) {
+                document.documentElement.style.setProperty('--primary-color', savedColor);
+                document.documentElement.style.setProperty('--secondary-color', adjustColorBrightness(savedColor, 20));
+            }
+        });
+
+        function adjustColorBrightness(hex, percent) {
+            hex = hex.replace('#', '');
+            const num = parseInt(hex, 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (
+                0x1000000 +
+                (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)
+            ).toString(16).slice(1);
+        }
+    </script>
 </body>
 </html>
+{% endblock %}

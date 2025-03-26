@@ -1,0 +1,383 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MomCare - Pregnancy Healthcare Solution</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        .navbar {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .navbar-scrolled {
+            background: rgba(255, 255, 255, 0.98) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero {
+            padding-top: 80px; /* Add padding to prevent content from hiding behind fixed navbar */
+        }
+
+        /* FAQ Styles */
+        .faq-item {
+            margin-bottom: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+        }
+
+        .faq-question:hover {
+            background: #f8f9fa;
+        }
+
+        .faq-answer {
+            background: #fff;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+            padding: 0 1.5rem;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 1000px;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        .faq-icon i {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon i {
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='uploads/LOgo.png') }}" alt="MomCare">
+                <span>Mom Care</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#features">Features</a>
+                <a href="#services">Services</a>
+                <a href="#testimonials">Stories</a>
+                <a href="#footer" class="contact-btn">Contact</a>
+                <a href="{{ url_for('home') }}" class="login-btn">Get Started</a>
+            </div>
+            <div class="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero">
+        <div class="hero-content animate__animated animate__fadeIn">
+            <h1 class="gradient-text">Empowering Your<br>Pregnancy Journey</h1>
+            <p>Your trusted companion for a healthy and happy pregnancy</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('register') }}" class="btn-primary">Start Your Journey</a>
+                
+            </div>
+            
+        </div>
+        <div class="hero-image animate__animated animate__fadeInRight" style="width: 100%; max-width: 600px;">
+            <img src="{{ url_for('static', filename='uploads/main1.png') }}" alt="Pregnancy Care" style="width: 100%; height: auto; object-fit: contain;">
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="section-header">
+       
+            <h2 class="section-title" data-aos="fade-up" data-aos-delay="100">Why Choose MomCare?</h2>
+            <p class="section-description" data-aos="fade-up" data-aos-delay="200">Comprehensive pregnancy care at your fingertips</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="100">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3>Pregnancy Weight Gain Calculator</h3>
+                <p>Track and monitor your pregnancy weight gain with our smart calculator</p>
+                <div class="feature-hover">
+                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="200">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>Healthcare Chatbot</h3>
+                <p>24/7 instant answers to your pregnancy-related questions</p>
+                <div class="feature-hover">
+                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="300">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Book Appointments</h3>
+                <p>Schedule doctor visits and checkups with ease</p>
+                <div class="feature-hover">
+                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="feature-card" data-aos="zoom-in" data-aos-delay="400">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-notes-medical"></i>
+                </div>
+                <h3>Health Records</h3>
+                <p>Securely store and access your pregnancy health records</p>
+                <div class="feature-hover">
+                    <a href="#" class="feature-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="services">
+        <div class="section-header">
+            <span class="service-badge" data-aos="fade-down">
+                <i class="fas fa-star"></i> Premium Services
+            </span>
+            <h2 class="service-title" data-aos="fade-up">Complete Pregnancy Care Solutions</h2>
+            <p class="service-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Experience comprehensive care throughout your pregnancy journey with our professional healthcare services
+            </p>
+        </div>
+        
+        <div class="services-grid">
+            <!-- Service Card 1 -->
+            <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-icon">
+                    <i class="fas fa-stethoscope"></i>
+                </div>
+                <div class="service-content">
+                    <h3>Prenatal Care</h3>
+                    <p>Comprehensive prenatal care and monitoring with expert guidance throughout your pregnancy journey.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Regular health checkups</li>
+                        <li><i class="fas fa-check-circle"></i> Vital signs monitoring</li>
+                        <li><i class="fas fa-check-circle"></i> Expert consultation</li>
+                    </ul>
+                    <a href="#" class="service-btn">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Service Card 2 -->
+            <div class="service-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="service-content">
+                    <h3>Health Tracking</h3>
+                    <p>Advanced health monitoring system to track your progress and ensure a healthy pregnancy.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Real-time monitoring</li>
+                        <li><i class="fas fa-check-circle"></i> Health analytics</li>
+                        <li><i class="fas fa-check-circle"></i> Progress reports</li>
+                    </ul>
+                    <a href="#" class="service-btn">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Service Card 3 -->
+            <div class="service-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="service-content">
+                    <h3>Expert Consultation</h3>
+                    <p>24/7 access to healthcare professionals for personalized guidance and support.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check-circle"></i> Video consultations</li>
+                        <li><i class="fas fa-check-circle"></i> Emergency support</li>
+                        <li><i class="fas fa-check-circle"></i> Specialist referrals</li>
+                    </ul>
+                    <a href="#" class="service-btn">
+                        Learn More <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="faq">
+    <div class="faq-pattern"></div>
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge" data-aos="fade-down">
+                <i class="fas fa-question-circle"></i>
+            </span>
+            <h2 class="section-title" data-aos="fade-up">Frequently Asked Questions</h2>
+            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Find answers to common questions about MomCare pregnancy healthcare services
+            </p>
+        </div>
+        
+        <div class="faq-grid">
+            <div class="faq-item" data-aos="fade-up">
+                <div class="faq-question">
+                    <h3>How does MomCare help during pregnancy?</h3>
+                    <span class="faq-icon"><i class="fas fa-plus"></i></span>
+                </div>
+                <div class="faq-answer">
+                    <p>MomCare offers comprehensive support through:</p>
+                    <ul>
+                        <li>24/7 health monitoring and tracking</li>
+                        <li>Direct access to healthcare professionals</li>
+                        <li>Personalized nutrition and exercise plans</li>
+                        <li>Automated appointment scheduling</li>
+                        <li>Real-time health alerts and reminders</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item" data-aos="fade-up" data-aos-delay="100">
+                <div class="faq-question">
+                    <h3>What features are included in the app?</h3>
+                    <span class="faq-icon"><i class="fas fa-plus"></i></span>
+                </div>
+                <div class="faq-answer">
+                    <p>Our app includes essential features such as:</p>
+                    <ul>
+                        <li>Health vitals tracking dashboard</li>
+                        <li>Doctor appointment scheduling</li>
+                        <li>Medication and supplement reminders</li>
+                        <li>Diet and nutrition planning</li>
+                        <li>Emergency contact system</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item" data-aos="fade-up" data-aos-delay="200">
+                <div class="faq-question">
+                    <h3>How do I connect with healthcare providers?</h3>
+                    <span class="faq-icon"><i class="fas fa-plus"></i></span>
+                </div>
+                <div class="faq-answer">
+                    <p>MomCare provides multiple ways to connect with healthcare providers:</p>
+                    <ul>
+                        <li>In-app chat with doctors</li>
+                        <li>Video consultation booking</li>
+                        <li>Emergency helpline access</li>
+                        <li>Direct appointment scheduling</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="faq-item" data-aos="fade-up" data-aos-delay="300">
+                <div class="faq-question">
+                    <h3>Is my health data secure?</h3>
+                    <span class="faq-icon"><i class="fas fa-plus"></i></span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, we take data security seriously. MomCare ensures:</p>
+                    <ul>
+                        <li>End-to-end encryption of all data</li>
+                        <li>HIPAA compliance</li>
+                        <li>Secure cloud storage</li>
+                        <li>Regular security audits</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    
+
+    <footer id="footer" class="footer">
+        <div class="footer-waves">
+            <div class="wave" id="wave1"></div>
+            <div class="wave" id="wave2"></div>
+            <div class="wave" id="wave3"></div>
+            <div class="wave" id="wave4"></div>
+        </div>
+        <div class="footer-content">
+            <div class="footer-section brand">
+                <h3><i class="fas fa-heartbeat"></i> MomCare</h3>
+                <p>Your trusted pregnancy healthcare companion, providing comprehensive care and support throughout your journey.</p>
+                <div class="social-links">
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#features"><i class="fas fa-chevron-right"></i> Features</a></li>
+                    <li><a href="#services"><i class="fas fa-chevron-right"></i> Services</a></li>
+                    <li><a href="#testimonials"><i class="fas fa-chevron-right"></i> Testimonials</a></li>
+                    <li><a href="#faq"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                    <li><a href="#footer"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section contact">
+                <h3>Contact Us</h3>
+                <div class="contact-info">
+                    <p>
+                        <i class="fas fa-phone-alt"></i>
+                        <span>+1 234 567 890</span>
+                    </p>
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        <span>support@momcare.com</span>
+                    </p>
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>123 Healthcare Street, Medical District<br>New York, NY 10001</span>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-section newsletter">
+                <h3>Newsletter</h3>
+                <p>Subscribe for updates and special offers</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-subscribe">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 MomCare. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="{{ url_for('static', filename='landing.js') }}"></script>
+</body>
+</html>
+{% endblock %}

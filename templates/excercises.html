@@ -1,0 +1,986 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Exercises</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #7e57c2;
+            --secondary-color: #ff4081;
+            --accent-color: #5e35b1;
+            --light-color: #f5f0ff;
+            --dark-color: #4527a0;
+            --card-bg-1: #fff3f8;
+            --card-bg-2: #f0f8ff;
+            --card-bg-3: #f2fff0;
+            --card-bg-4: #fff8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background-image: linear-gradient(135deg, #f8f9fa 0%, var(--light-color) 100%);
+            margin: 0;
+            padding: 30px 20px 60px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            bottom: -10px;
+            left: 20%;
+            border-radius: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .filter-btn:hover {
+            background: var(--light-color);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .exercise-card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .exercise-card:nth-child(4n+1) {
+            background: var(--card-bg-1);
+        }
+
+        .exercise-card:nth-child(4n+2) {
+            background: var(--card-bg-2);
+        }
+
+        .exercise-card:nth-child(4n+3) {
+            background: var(--card-bg-3);
+        }
+
+        .exercise-card:nth-child(4n+4) {
+            background: var(--card-bg-4);
+        }
+
+        .exercise-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .exercise-card:hover .exercise-image {
+            transform: scale(1.05);
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trimester-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--secondary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .intensity-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 1;
+            color: white;
+        }
+
+        .intensity-low {
+            background: #66bb6a;
+        }
+
+        .intensity-medium {
+            background: #ffa726;
+        }
+
+        .intensity-high {
+            background: #ef5350;
+        }
+
+        .exercise-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .exercise-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .exercise-description {
+            color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .exercise-meta {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .meta-item i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .meta-value {
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(126, 87, 194, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(126, 87, 194, 0.4);
+        }
+
+        .video-preview {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .exercise-card:hover .video-preview {
+            opacity: 1;
+        }
+
+        .benefits-list {
+            padding-left: 15px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .benefits-list li {
+            margin-bottom: 4px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .exercise-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .exercise-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                flex-direction: row;
+                overflow-x: auto;
+                padding-bottom: 10px;
+                justify-content: flex-start;
+            }
+            
+            .filter-btn {
+                flex: 0 0 auto;
+            }
+        }
+
+        /* Animation classes */
+        .fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Video Modal Styles */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: var(--primary-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(126, 87, 194, 0.3);
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(126, 87, 194, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Pregnancy Exercises</h1>
+            <p class="subtitle">Safe, effective exercises customized for each trimester to help you stay active and healthy during your pregnancy</p>
+        </div>
+        
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All Exercises</button>
+            <button class="filter-btn" data-filter="first">First Trimester</button>
+            <button class="filter-btn" data-filter="second">Second Trimester</button>
+            <button class="filter-btn" data-filter="third">Third Trimester</button>
+            <button class="filter-btn" data-filter="postpartum">Postpartum</button>
+            <button class="filter-btn" data-filter="low">Low Intensity</button>
+            <button class="filter-btn" data-filter="medium">Medium Intensity</button>
+        </div>
+        
+        <div class="exercise-grid">
+            <!-- Exercise cards will be dynamically generated here -->
+            
+            <!-- First Trimester Exercises -->
+            <div class="exercise-card fadeIn" data-category="first low" data-video-url="https://www.youtube.com/embed/-3bvlFKeLRE?si=A6MTx0vDa2TU77S3">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/prenatal_yoga.jpg') }}" alt="Prenatal Yoga" class="exercise-image">
+                    <div class="trimester-badge">First Trimester</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Prenatal Yoga</h3>
+                    <p class="exercise-description">Gentle stretching and breathing exercises to improve flexibility and reduce stress.</p>
+                    <ul class="benefits-list">
+                        <li>Reduces back pain</li>
+                        <li>Improves sleep quality</li>
+                        <li>Increases strength and flexibility</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">20 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">1</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">3x/week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise-card fadeIn" data-category="first medium" data-video-url="https://www.youtube.com/embed/enYITYwvPAQ?si=rFPd9zKBfazw3rzD">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/walking.jpg') }}" alt="Walking" class="exercise-image">
+                    <div class="trimester-badge">First Trimester</div>
+                    <div class="intensity-badge intensity-medium">Medium Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Brisk Walking</h3>
+                    <p class="exercise-description">Low-impact cardio exercise that's safe throughout pregnancy.</p>
+                    <ul class="benefits-list">
+                        <li>Boosts cardiovascular health</li>
+                        <li>Improves mood and energy levels</li>
+                        <li>Helps manage weight gain</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">30 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">1</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">5x/week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- First Trimester Exercises (Additional) -->
+            <div class="exercise-card fadeIn" data-category="first medium" data-video-url="https://www.youtube.com/embed/3nYPkYX37nI?si=A6MTx0vDa2TU77S3">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/stationary_bike.jpg') }}" alt="Stationary Cycling" class="exercise-image">
+                    <div class="trimester-badge">First Trimester</div>
+                    <div class="intensity-badge intensity-medium">Medium Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Stationary Cycling</h3>
+                    <p class="exercise-description">Low-impact cardiovascular exercise that's safe for early pregnancy.</p>
+                    <ul class="benefits-list">
+                        <li>Maintains cardiovascular fitness</li>
+                        <li>No risk of falling</li>
+                        <li>Adjustable intensity levels</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class "meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">20-30 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">1</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">3x/week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Second Trimester Exercises -->
+            <div class="exercise-card fadeIn" data-category="second low" data-video-url="https://www.youtube.com/embed/SC1fxiQM0u8?si=CWaHQZIvEduKuHlB">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/swimming.jpg') }}" alt="Swimming" class="exercise-image">
+                    <div class="trimester-badge">Second Trimester</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Swimming & Water Aerobics</h3>
+                    <p class="exercise-description">Water-based exercises that support your body weight and reduce pressure on joints.</p>
+                    <ul class="benefits-list">
+                        <li>Reduces swelling and edema</li>
+                        <li>Relieves pressure on sciatic nerve</li>
+                        <li>Strengthens entire body</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">25 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">1</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">2x/week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise-card fadeIn" data-category="second medium" data-video-url="https://www.youtube.com/embed/e8_pNWIBa2M?si=4eOwxR1hDcYUNshC">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/squats.jpg') }}" alt="Squats" class="exercise-image">
+                    <div class="trimester-badge">Second Trimester</div>
+                    <div class="intensity-badge intensity-medium">Medium Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Modified Squats</h3>
+                    <p class="exercise-description">Strengthen your legs, glutes and pelvic floor muscles with supported squats.</p>
+                    <ul class="benefits-list">
+                        <li>Prepares for labor and delivery</li>
+                        <li>Improves lower body strength</li>
+                        <li>Helps with posture during pregnancy</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-redo-alt"></i>
+                            <span class="meta-label">Reps</span>
+                            <span class="meta-value">12-15</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">3</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">3x/week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Trimester Exercises (Additional) -->
+            <div class="exercise-card fadeIn" data-category="second medium" data-video-url="https://www.youtube.com/embed/56tNrxn9fkY?si=inE6XG4vkXbUUizq">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/resistance_bands.jpg') }}" alt="Resistance Band Training" class="exercise-image">
+                    <div class="trimester-badge">Second Trimester</div>
+                    <div class="intensity-badge intensity-medium">Medium Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Resistance Band Workout</h3>
+                    <p class="exercise-description">Safe strength training using resistance bands to maintain muscle tone.</p>
+                    <ul class="benefits-list">
+                        <li>Maintains muscle strength</li>
+                        <li>Improves posture</li>
+                        <li>Highly adaptable exercises</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-redo-alt"></i>
+                            <span class="meta-label">Reps</span>
+                            <span class="meta-value">12-15</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">2-3</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">2x/week</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Third Trimester Exercises -->
+            <div class="exercise-card fadeIn" data-category="third low" data-video-url="https://www.youtube.com/embed/moa4h-rjuNE?si=LJcalgsArtyDvEWO">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/pelvic_tilt.jpg') }}" alt="Pelvic Tilt" class="exercise-image">
+                    <div class="trimester-badge">Third Trimester</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Pelvic Tilts</h3>
+                    <p class="exercise-description">Gentle exercise to strengthen abdominal muscles and relieve back pain.</p>
+                    <ul class="benefits-list">
+                        <li>Reduces lower back pain</li>
+                        <li>Improves posture</li>
+                        <li>Strengthens core muscles safely</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-redo-alt"></i>
+                            <span class="meta-label">Reps</span>
+                            <span class="meta-value">10</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">3</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">Daily</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="exercise-card fadeIn" data-category="third low" data-video-url="https://www.youtube.com/embed/nBfbJ-3tUdc?si=6SztPRtC2TRmtFuI">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/kegels.jpg') }}" alt="Kegel Exercises" class="exercise-image">
+                    <div class="trimester-badge">Third Trimester</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Kegel Exercises</h3>
+                    <p class="exercise-description">Strengthen pelvic floor muscles to support the increased weight of pregnancy.</p>
+                    <ul class="benefits-list">
+                        <li>Prepares for labor and delivery</li>
+                        <li>Prevents urinary incontinence</li>
+                        <li>Improves postpartum recovery</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-redo-alt"></i>
+                            <span class="meta-label">Reps</span>
+                            <span class="meta-value">10-15</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">3</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">Daily</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third Trimester Exercises (Additional) -->
+            <div class="exercise-card fadeIn" data-category="third low" data-video-url="https://www.youtube.com/embed/pxACsE_bH-Y?si=QDLRmHyaGqO4fg2w">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/birthing_ball.jpg') }}" alt="Birthing Ball Exercises" class="exercise-image">
+                    <div class="trimester-badge">Third Trimester</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Birthing Ball Exercises</h3>
+                    <p class="exercise-description">Gentle movements on a birthing ball to ease discomfort and prepare for labor.</p>
+                    <ul class="benefits-list">
+                        <li>Relieves back pressure</li>
+                        <li>Improves pelvic positioning</li>
+                        <li>Strengthens core stability</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">15-20 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">2</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">Daily</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Postpartum Exercises -->
+            <div class="exercise-card fadeIn" data-category="postpartum low" data-video-url="https://www.youtube.com/embed/Ilg-gQY2Rxc?si=zmdnrla-stSNtHgT">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/pelvic_floor.jpg') }}" alt="Pelvic Floor Recovery" class="exercise-image">
+                    <div class="trimester-badge">Postpartum</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Pelvic Floor Recovery</h3>
+                    <p class="exercise-description">Gentle exercises to strengthen your pelvic floor muscles after delivery.</p>
+                    <ul class="benefits-list">
+                        <li>Helps prevent incontinence</li>
+                        <li>Supports core recovery</li>
+                        <li>Improves bladder control</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-redo-alt"></i>
+                            <span class="meta-label">Reps</span>
+                            <span class="meta-value">10</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">3</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">Daily</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="exercise-card fadeIn" data-category="postpartum low" data-video-url="https://www.youtube.com/embed/Qd4QBIoKrJM?si=UwBd11z27gt3J3Lg">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/gentle_walks.jpg') }}" alt="Gentle Walking" class="exercise-image">
+                    <div class="trimester-badge">Postpartum</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Gentle Walking</h3>
+                    <p class="exercise-description">Start rebuilding strength and stamina with short walks.</p>
+                    <ul class="benefits-list">
+                        <li>Promotes healing</li>
+                        <li>Reduces risk of blood clots</li>
+                        <li>Boosts mood and energy</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">10-15 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">1</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">Daily</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Postpartum Exercises (Additional) -->
+            <div class="exercise-card fadeIn" data-category="postpartum low" data-video-url="https://www.youtube.com/embed/3fHTSzY42rs?si=IFRvPNhhHA6DqRDA">
+                <div class="image-container">
+                    <img src="{{ url_for('static', filename='exercise_images/diaphragm_breathing.jpg') }}" alt="Diaphragmatic Breathing" class="exercise-image">
+                    <div class="trimester-badge">Postpartum</div>
+                    <div class="intensity-badge intensity-low">Low Intensity</div>
+                    <div class="video-preview"><i class="fas fa-play"></i></div>
+                </div>
+                <div class="exercise-content">
+                    <h3 class="exercise-title">Diaphragmatic Breathing</h3>
+                    <p class="exercise-description">Deep breathing exercises to reconnect with core muscles and reduce stress.</p>
+                    <ul class="benefits-list">
+                        <li>Activates deep core muscles</li>
+                        <li>Reduces postpartum anxiety</li>
+                        <li>Improves mind-body connection</li>
+                    </ul>
+                    <div class="exercise-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-stopwatch"></i>
+                            <span class="meta-label">Duration</span>
+                            <span class="meta-value">5-10 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-redo"></i>
+                            <span class="meta-label">Sets</span>
+                            <span class="meta-value">2-3</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span class="meta-label">Frequency</span>
+                            <span class="meta-value">2x/day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="btn-container">
+            <a href="{{ url_for('dashboard') }}" class="btn">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+
+    <div class="modal-overlay" id="videoOverlay"></div>
+    <div class="video-modal" id="videoModal">
+        <div class="close-modal" id="closeModal">
+            <i class="fas fa-times"></i>
+        </div>
+        <iframe width="560" height="315" 
+                src="https://www.youtube.com/embed/-3bvlFKeLRE?si=A6MTx0vDa2TU77S3" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin" 
+                allowfullscreen>
+        </iframe>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const exerciseCards = document.querySelectorAll('.exercise-card');
+            const videoModal = document.getElementById('videoModal');
+            const videoOverlay = document.getElementById('videoOverlay');
+            const closeModal = document.getElementById('closeModal');
+            const modalIframe = videoModal.querySelector('iframe');
+
+            // Filter functionality
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    exerciseCards.forEach(card => {
+                        card.style.display = 'none';
+                        card.classList.remove('fadeIn');
+                    });
+                    
+                    if (filter === 'all') {
+                        exerciseCards.forEach(card => {
+                            setTimeout(() => {
+                                card.style.display = 'flex';
+                                card.classList.add('fadeIn');
+                            }, 10);
+                        });
+                    } else {
+                        exerciseCards.forEach(card => {
+                            if (card.getAttribute('data-category').includes(filter)) {
+                                setTimeout(() => {
+                                    card.style.display = 'flex';
+                                    card.classList.add('fadeIn');
+                                }, 10);
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Video modal functionality
+            const videoButtons = document.querySelectorAll('.video-preview');
+            
+            videoButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const card = this.closest('.exercise-card');
+                    const videoUrl = card.getAttribute('data-video-url');
+                    
+                    if (videoUrl) {
+                        modalIframe.src = videoUrl;
+                        videoModal.style.display = 'block';
+                        videoOverlay.style.display = 'block';
+                    } else {
+                        alert('Video coming soon!');
+                    }
+                });
+            });
+
+            function closeVideoModal() {
+                videoModal.style.display = 'none';
+                videoOverlay.style.display = 'none';
+                modalIframe.src = ''; // Clear the iframe source
+            }
+
+            closeModal.addEventListener('click', closeVideoModal);
+            videoOverlay.addEventListener('click', closeVideoModal);
+
+            // Clean up video when modal is hidden
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && videoModal.style.display === 'block') {
+                    closeVideoModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %}

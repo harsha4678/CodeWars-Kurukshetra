@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Your Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <h2 class="mb-4">Manage Your Profile</h2>
+
+    <form method="POST" action="{{ url_for('profile') }}">
+        <div class="card">
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" class="form-control" value="{{ user.name }}" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Age:</label>
+                    <input type="number" class="form-control" name="age" value="{{ user.age }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Weight (kg):</label>
+                    <input type="number" class="form-control" step="0.1" name="weight" id="weight" value="{{ user.weight }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Height (cm):</label>
+                    <input type="number" class="form-control" step="0.1" name="height" id="height" value="{{ user.height }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Due Date:</label>
+                    <input type="date" class="form-control" name="due_date" value="{{ user.due_date }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Partner Name:</label>
+                    <input type="text" class="form-control" name="partner_name" value="{{ user.partner_name }}">
+                </div>
+                <div class="form-group">
+                    <label>Partner Phone:</label>
+                    <input type="text" class="form-control" name="partner_phone" value="{{ user.partner_phone }}">
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block">Save Profile Changes</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="mt-4">
+        <h5>Your Pregnancy Journey</h5>
+        {% if user.due_date %}
+        <div class="alert alert-info">
+            Estimated Due Date: <strong>{{ user.due_date }}</strong><br>
+            {% if days_remaining >= 0 %}
+                Days Remaining: <strong>{{ days_remaining }}</strong> days
+            {% else %}
+                Your due date has passed.
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="card-body">
+                <h6>BMI Calculator</h6>
+                <p id="bmiResult" class="font-weight-bold text-primary">Fill height & weight to calculate BMI</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const weightInput = document.getElementById('weight');
+        const heightInput = document.getElementById('height');
+        const bmiResult = document.getElementById('bmiResult');
+
+        function calculateBMI() {
+            const weight = parseFloat(weightInput.value);
+            const height = parseFloat(heightInput.value) / 100;  // cm to m
+
+            if (weight > 0 && height > 0) {
+                const bmi = weight / (height * height);
+                const roundedBMI = bmi.toFixed(1);
+
+                let category = '';
+                if (bmi < 18.5) {
+                    category = 'Underweight';
+                } else if (bmi < 25) {
+                    category = 'Normal weight';
+                } else if (bmi < 30) {
+                    category = 'Overweight';
+                } else {
+                    category = 'Obese';
+                }
+
+                bmiResult.innerHTML = `Your BMI: <strong>${roundedBMI}</strong> (${category})`;
+            } else {
+                bmiResult.innerHTML = 'Fill height & weight to calculate BMI';
+            }
+        }
+
+        weightInput.addEventListener('input', calculateBMI);
+        heightInput.addEventListener('input', calculateBMI);
+
+        // Trigger BMI calculation if values are already present
+        calculateBMI();
+    });
+</script>
+
+</body>
+</html>

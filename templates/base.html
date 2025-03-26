@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MomCare - Pregnancy Healthcare Companion</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>{% block title %}MomCare{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     {% block additional_styles %}{% endblock %}
@@ -37,41 +35,15 @@
     </style>
 </head>
 <body {% if dark_mode %}data-theme="dark"{% endif %}>
-    <nav class="navbar">
-        <div class="container">
-            <a href="{{ url_for('home') }}" class="navbar-brand">MomCare</a>
-            {% if 'user_id' in session %}
-            <div class="nav-links">
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('appointments') }}">Appointments</a>
-                <a href="{{ url_for('records') }}">Records</a>
-                <a href="{{ url_for('diet_plan') }}">Diet Plan</a>
-                <a href="{{ url_for('symptom_checker') }}">Symptoms</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
-            </div>
-            {% endif %}
-        </div>
+    <nav>
+        <!-- Add your navigation menu here -->
     </nav>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="container">
-                {% for message in messages %}
-                    <div class="alert">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
-
+    
     <div id="app">
         {% block content %}{% endblock %}
     </div>
 
     <div id="google_translate_element"></div>
-
-    <footer class="footer">
-        <p>&copy; 2024 MomCare. All rights reserved.</p>
-    </footer>
 
     <script type="text/javascript">
         function googleTranslateElementInit() {

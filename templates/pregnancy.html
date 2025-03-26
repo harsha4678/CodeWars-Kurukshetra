@@ -1,0 +1,966 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Calculator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7e57c2;
+            --secondary-color: #b39ddb;
+            --accent-color: #5e35b1;
+            --light-color: #f5f0ff;
+            --dark-color: #4527a0;
+            --success-color: #66bb6a;
+            --info-bg: #e3f2fd;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            background-image: linear-gradient(135deg, #f8f9fa 0%, var(--light-color) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 40px;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        .page-header {
+            padding: 30px 0;
+            text-align: left;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(126, 87, 194, 0.1);
+        }
+        
+        .page-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0;
+            position: relative;
+            display: block;
+            padding-left: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .page-title::after {
+            display: none;
+        }
+        
+        .calculator-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: #fff;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .calculator-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-bottom: none;
+            padding: 15px 20px;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(126, 87, 194, 0.25);
+            background-color: #fff;
+        }
+        
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%237e57c2' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-size: 16px 12px;
+        }
+        
+        .btn-calculate {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(126, 87, 194, 0.2);
+        }
+        
+        .btn-calculate:hover {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(126, 87, 194, 0.3);
+        }
+        
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+        
+        .result-box {
+            display: none;
+            border-radius: 15px;
+            background-color: var(--light-color);
+            border-left: 4px solid var(--accent-color);
+            text-align: left;
+            margin-top: 20px;
+            padding: 25px;
+            animation: fadeIn 0.5s ease-in-out;
+            box-shadow: 0 5px 15px rgba(126, 87, 194, 0.1);
+        }
+        
+        .result-title {
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+            position: relative;
+            display: block;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        .result-title::after {
+            display: none;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            padding-left: 15px;
+        }
+        
+        .due-date-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .days-text {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .days-number {
+            font-weight: 700;
+            color: var(--success-color);
+        }
+        
+        .message-text {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .history-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: #fff;
+            margin-bottom: 25px;
+        }
+            
+        .history-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-5px);
+        }
+
+        .history-header {
+            background-color: var(--success-color);
+            color: white;
+            font-weight: 600;
+            padding: 15px 20px;
+            border-bottom: none;
+        }
+        
+        .history-body {
+            padding: 0;
+        }
+        
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            padding: 15px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .list-group-item:hover {
+            background-color: var(--info-bg);
+        }
+        
+        .list-group-item:first-child {
+            border-top: none;
+        }
+        
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .date-badge {
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .due-date-badge {
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .date-type-icon {
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+        
+        .form-floating {
+            margin-bottom: 20px;
+        }
+        
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: 60px;
+            padding: 1.5rem 0.75rem 0.5rem;
+        }
+        
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+        }
+        
+        .info-tooltip {
+            color: var(--secondary-color);
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .info-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: #fff;
+            margin-bottom: 25px;
+            height: 100%;
+            position: sticky;
+            top: 20px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .pregnancy-info-content {
+            /* Remove max-height and overflow-y to eliminate scrollbar */
+            padding-right: 10px;
+            scrollbar-width: thin;
+        }
+        
+        .pregnancy-info-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .pregnancy-info-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .pregnancy-info-content::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 10px;
+        }
+        
+        .info-card .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-bottom: none;
+            padding: 15px 20px;
+        }
+        
+        .info-title {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+            display: block;
+            padding-left: 15px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .info-title::after {
+            display: none;
+        }
+        
+        .info-list {
+            padding-left: 1.2rem;
+        }
+        
+        .info-list li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        
+        /* Divider style */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--accent-color);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--secondary-color);
+        }
+        
+        .divider::before {
+            margin-right: 0.5em;
+        }
+        
+        .divider::after {
+            margin-left: 0.5em;
+        }
+        
+        /* Enhanced Timeline */
+        .timeline {
+            margin: 15px 0;
+            position: relative;
+            padding-left: 45px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(180deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            top: 0;
+            bottom: 0;
+            left: 31px;
+            border-radius: 4px;
+            opacity: 0.7;
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            background-color: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary-color);
+            margin-left: 15px;
+        }
+        
+        .timeline-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary-color);
+            left: -54px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 4px rgba(126, 87, 194, 0.1);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: var(--primary-color);
+            left: -38px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.7;
+        }
+        
+        .timeline-item.highlight {
+            border-left: 4px solid var(--accent-color);
+            background-color: var(--light-color);
+        }
+        
+        .timeline-item.highlight::before {
+            background: var(--accent-color);
+            border-color: white;
+            box-shadow: 0 0 0 4px rgba(94, 53, 177, 0.15);
+        }
+        
+        .timeline-item.highlight::after {
+            background: var(--accent-color);
+        }
+        
+        .timeline-week {
+            font-weight: 700;
+            color: var(--dark-color);
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .timeline-item p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .timeline-item.highlight p {
+            color: var(--dark-color);
+        }
+        
+        @media (max-width: 576px) {
+            .timeline {
+                padding-left: 35px;
+            }
+            
+            .timeline::before {
+                left: 21px;
+            }
+            
+            .timeline-item {
+                margin-left: 10px;
+                padding: 15px 20px;
+            }
+            
+            .timeline-item::before {
+                left: -44px;
+                width: 14px;
+                height: 14px;
+            }
+            
+            .timeline-item::after {
+                left: -28px;
+                width: 15px;
+            }
+        }
+        
+        /* Mini info cards */
+        .info-cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .mini-info-card {
+            background-color: var(--light-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .mini-info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .mini-info-icon {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .mini-info-card h6 {
+            color: var(--dark-color);
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .small-list {
+            padding-left: 20px;
+            margin-bottom: 0;
+        }
+        
+        .small-list li {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        
+        /* Enhanced info note */
+        .info-note {
+            background: var(--info-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .info-note i {
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            margin-top: 2px;
+        }
+        
+        .info-note p {
+            margin: 0;
+            padding-left: 10px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .info-note .small {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 991.98px) {
+            .info-card {
+                position: static;
+                margin-top: 25px;
+            }
+            
+            .info-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+                
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Add these styles */
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: var(--primary-color);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .back-btn i {
+            margin-right: 5px;
+        }
+
+        .page-header {
+            position: relative;
+        }
+
+        .history-card .list-group-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .date-type-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-badge {
+            margin-left: auto;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0 15px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <a href="/dashboard" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+            </a>
+            <h1 class="page-title">Pregnancy Due Date Calculator</h1>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-7">
+                <div class="calculator-card">
+                    <div class="card-header">
+                        <i class="fas fa-calculator me-2"></i> Calculate Your Due Date
+                    </div>
+                    <div class="card-body">
+                        <form id="pregnancy-form">
+                            <div class="form-floating mb-4">
+                                <select class="form-select" name="date_type" id="date_type" required>
+                                    <option value="LMP">Last Menstrual Period</option>
+                                    <option value="Due Date">Known Due Date</option>
+                                    <option value="Ultrasound">Ultrasound Date</option>
+                                    <option value="Conception Date">Conception Date</option>
+                                    <option value="IVF Transfer Date">IVF Transfer Date</option>
+                                </select>
+                                <label for="date_type">Calculate Based On</label>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input type="date" class="form-control" id="input_date" name="input_date" required>
+                                <label for="input_date">Select Date</label>
+                            </div>
+
+                            <div class="form-floating mb-4" id="cycle_length_div">
+                                <input type="number" class="form-control" id="cycle_length" name="cycle_length" value="28" min="21" max="35">
+                                <label for="cycle_length">Average Cycle Length (Days) <i class="fas fa-info-circle info-tooltip" title="Most women have cycles between 21-35 days"></i></label>
+                            </div>
+
+                            <div class="form-floating mb-4" id="ultrasound_details_div" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" id="weeks" name="weeks" value="0" min="0" max="42">
+                                            <label for="weeks">Weeks</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="number" class="form-control" id="days" name="days" value="0" min="0" max="6">
+                                            <label for="days">Days</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <small class="text-muted">Enter the length of pregnancy reported in your ultrasound</small>
+                            </div>
+
+                            <div class="form-floating mb-4" id="embryo_age_div" style="display: none;">
+                                <input type="number" class="form-control" id="embryo_age" name="embryo_age" value="3" min="0" max="7">
+                                <label for="embryo_age">Embryo Age (Days)</label>
+                            </div>
+
+                            <button type="submit" class="btn btn-calculate w-100">
+                                <i class="fas fa-calendar-check me-2"></i> Calculate Due Date
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="result-box" id="result-box">
+                    <h3 class="result-title">Your Pregnancy Timeline</h3>
+                    <div class="result-content">
+                        <div class="result-item">
+                            <p id="due-date" class="due-date-text mb-0"></p>
+                        </div>
+                        <div class="result-item">
+                            <p id="days-remaining" class="days-text mb-0"></p>
+                        </div>
+                        <div class="result-item">
+                            <p id="message" class="message-text mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-card mt-5">
+                    <div class="card-header history-header">
+                        <i class="fas fa-history me-2"></i> Previous Calculations
+                    </div>
+                    <div class="card-body history-body">
+                        <ul class="list-group list-group-flush">
+                            {% for record in pregnancy_data %}
+                            <li class="list-group-item">
+                                <div class="date-type-container">
+                                    <i class="fas fa-{icon} date-type-icon"></i>
+                                    <span>{{ record.date_type }}</span>
+                                </div>
+                                <span class="date-badge">{{ record.input_date }}</span>
+                                <span class="due-date-badge">
+                                    <i class="fas fa-baby me-1"></i> {{ record.calculated_due_date }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="info-card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle me-2"></i> Pregnancy Information Guide
+                    </div>
+                    <div class="card-body pregnancy-info-content">
+                        <h5 class="info-title">Understanding Due Date Calculations</h5>
+                        <p>Medical professionals calculate due dates (Estimated Date of Delivery or EDD) using these methods:</p>
+                        <ul class="info-list">
+                            <li><strong>Last Menstrual Period (LMP):</strong> Add 280 days (40 weeks) to the first day of your last period using Naegele's Rule.</li>
+                            <li><strong>Conception Date:</strong> Add 266 days (38 weeks) to the estimated date of conception.</li>
+                            <li><strong>Ultrasound Dating:</strong> First-trimester ultrasounds provide the most accurate due date prediction (±7 days).</li>
+                            <li><strong>IVF Transfer:</strong> Add 266 days minus the embryo age at transfer (typically 3-5 days).</li>
+                        </ul>
+                        
+                        <div class="divider my-4"><span>Pregnancy Journey</span></div>
+                        
+                        <h5 class="info-title">Detailed Pregnancy Timeline</h5>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <span class="timeline-week">Weeks 1-2</span>
+                                <p>Pre-implantation: These weeks count before conception even occurs</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-week">Weeks 3-4</span>
+                                <p>Fertilization and implantation occur; pregnancy hormone (hCG) begins to rise</p>
+                            </div>
+                            <div class="timeline-item highlight">
+                                <span class="timeline-week">Weeks 5-8</span>
+                                <p>Embryonic period: Heart begins beating, neural tube forms, and basic organs develop</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-week">Weeks 9-13</span>
+                                <p>First trimester completion: All major organs formed, risk of miscarriage decreases</p>
+                            </div>
+                            <div class="timeline-item highlight">
+                                <span class="timeline-week">Weeks 14-17</span>
+                                <p>Gender becomes visible on ultrasound; you may begin to feel movement (quickening)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-week">Weeks 18-22</span>
+                                <p>Anatomy scan period; baby's movements become stronger and more noticeable</p>
+                            </div>
+                            <div class="timeline-item highlight">
+                                <span class="timeline-week">Weeks 23-27</span>
+                                <p>Viability reached; baby responds to sounds and has regular sleep-wake cycles</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-week">Weeks 28-31</span>
+                                <p>Third trimester begins: Rapid brain development, baby gains weight</p>
+                            </div>
+                            <div class="timeline-item highlight">
+                                <span class="timeline-week">Weeks 32-35</span>
+                                <p>Lung maturation; baby positions for birth; can survive outside with minimal support</p>
+                            </div>
+                            <div class="timeline-item">
+                                <span class="timeline-week">Weeks 36-38</span>
+                                <p>Full-term preparation: Baby gains approximately 1/2 pound weekly</p>
+                            </div>
+                            <div class="timeline-item highlight">
+                                <span class="timeline-week">Weeks 39-40</span>
+                                <p>Full term: Baby is ready for birth; average birth weight around 7.5 pounds</p>
+                            </div>
+                        </div>
+                        
+                        <div class="divider my-4"><span>Additional Information</span></div>
+                        
+                        <div class="info-cards-grid">
+                            <div class="mini-info-card">
+                                <div class="mini-info-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <h6>Term Classifications</h6>
+                                <ul class="small-list">
+                                    <li>Early term: 37-38 weeks</li>
+                                    <li>Full term: 39-40 weeks</li>
+                                    <li>Late term: 41 weeks</li>
+                                    <li>Post-term: 42+ weeks</li>
+                                </ul>
+                            </div>
+                            <div class="mini-info-card">
+                                <div class="mini-info-icon">
+                                    <i class="fas fa-heartbeat"></i>
+                                </div>
+                                <h6>Trimester Milestones</h6>
+                                <ul class="small-list">
+                                    <li>First: Weeks 0-13</li>
+                                    <li>Second: Weeks 14-27</li>
+                                    <li>Third: Weeks 28-40+</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="info-note mt-4">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <div>
+                                <p class="mb-1"><strong>Due Date Accuracy:</strong> Only about 5% of babies are born on their exact due date. Most arrive within 7-10 days before or after.</p>
+                                <p class="mb-0 small">Consult with your healthcare provider for personalized guidance throughout your pregnancy.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    <script>
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Handle form type change
+        document.getElementById('date_type').addEventListener('change', function () {
+            const cycleDiv = document.getElementById('cycle_length_div');
+            const embryoDiv = document.getElementById('embryo_age_div');
+            const ultrasoundDiv = document.getElementById('ultrasound_details_div');
+            
+            // Hide all optional divs first
+            cycleDiv.style.display = "none";
+            embryoDiv.style.display = "none";
+            ultrasoundDiv.style.display = "none";
+            
+            // Show relevant div based on selection
+            if (this.value === "LMP") {
+                cycleDiv.style.display = "block";
+                cycleDiv.classList.add('animate__animated', 'animate__fadeIn');
+            } else if (this.value === "IVF Transfer Date") {
+                embryoDiv.style.display = "block";
+                embryoDiv.classList.add('animate__animated', 'animate__fadeIn');
+            } else if (this.value === "Ultrasound") {
+                ultrasoundDiv.style.display = "block";
+                ultrasoundDiv.classList.add('animate__animated', 'animate__fadeIn');
+            }
+        });
+
+        // Form submission
+        document.getElementById("pregnancy-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const response = await fetch("/calculate_due_date", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+            const resultBox = document.getElementById("result-box");
+            
+            // Hide result box initially to reset animation
+            resultBox.style.display = "none";
+            
+            // Small timeout for animation effect
+            setTimeout(() => {
+                if (result.error) {
+                    resultBox.style.display = "block";
+                    document.getElementById("due-date").innerHTML = `<span class="text-danger"><i class="fas fa-exclamation-circle me-2"></i>${result.error}</span>`;
+                    document.getElementById("days-remaining").innerHTML = "";
+                    document.getElementById("message").innerHTML = "";
+                } else {
+                    resultBox.style.display = "block";
+                    document.getElementById("due-date").innerHTML = `<i class="fas fa-calendar-day me-2"></i> Due Date: <strong>${result.due_date}</strong>`;
+                    document.getElementById("days-remaining").innerHTML = `<i class="fas fa-hourglass-half me-2"></i> Days Remaining: <span class="days-number">${result.days_remaining}</span> days`;
+                    document.getElementById("message").innerHTML = `<i class="fas fa-info-circle me-2"></i> ${result.message}`;
+                    
+                    // Add this result to the history list
+                    addToHistory(formData.get('date_type'), formData.get('input_date'), result.due_date);
+                }
+                
+                // Scroll to result
+                resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 200);
+        });
+        
+        // Function to add new calculation to history (client-side only - would need backend implementation)
+        function addToHistory(dateType, inputDate, dueDate) {
+            const historyList = document.querySelector('.list-group');
+            
+            // Only add if the history section exists
+            if (!historyList) return;
+            
+            // Get icon based on date type
+            let icon = 'calendar-alt';
+            if (dateType === 'Due Date') icon = 'calendar-check';
+            else if (dateType === 'Ultrasound') icon = 'wave-square';
+            else if (dateType === 'Conception Date') icon = 'heart';
+            else if (dateType === 'IVF Transfer Date') icon = 'syringe';
+            
+            // Create new history item
+            const newItem = document.createElement('li');
+            newItem.className = 'list-group-item d-flex justify-content-between align-items-center animate__animated animate__fadeInDown';
+            newItem.innerHTML = `
+                <span>
+                    <i class="fas fa-${icon} date-type-icon"></i>
+                    ${dateType}
+                    <span class="date-badge ms-2">${inputDate}</span>
+                </span>
+                <span class="due-date-badge">
+                    <i class="fas fa-baby me-1"></i> ${dueDate}
+                </span>
+            `;
+            
+            // Add to the top of the list
+            if (historyList.firstChild) {
+                historyList.insertBefore(newItem, historyList.firstChild);
+            } else {
+                historyList.appendChild(newItem);
+            }
+        }
+    </script>
+</body>
+</html>
+{% endblock %}
