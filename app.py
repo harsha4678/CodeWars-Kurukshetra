@@ -3,6 +3,8 @@ import sqlite3
 import os
 from werkzeug.utils import secure_filename
 from hospital_utils import get_hospitals
+import re
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -23,6 +25,102 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def init_db():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Create users table
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # Create health records table
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS health_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
+    # Create appointments table
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS appointments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            hospital_name TEXT NOT NULL,
+            specialization TEXT NOT NULL,
+            date TEXT NOT NULL,
+            time TEXT NOT NULL,
+            status TEXT DEFAULT 'pending',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
+    # Create symptoms table
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS symptoms (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            symptom TEXT NOT NULL,
+            advice TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+# Initialize database when app starts
+with app.app_context():
+    init_db()
+
+def migrate_db():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Backup existing records if any
+    try:
+        cur.execute("SELECT * FROM health_records")
+        old_records = cur.fetchall()
+    except:
+        old_records = []
+
+    # Drop and recreate health_records table
+    cur.execute("DROP TABLE IF EXISTS health_records")
+    cur.execute('''
+        CREATE TABLE health_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
+    # Restore old records with new schema
+    for record in old_records:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], record['file_name'])
+        cur.execute('''
+            INSERT INTO health_records (user_id, file_name, file_path)
+            VALUES (?, ?, ?)
+        ''', (record['user_id'], record['file_name'], file_path))
+
+    conn.commit()
+    conn.close()
+
 # Home Route
 @app.route('/')
 def home():
@@ -32,39 +130,76 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form['name']
-        phone = request.form['phone']
+        name = request.form['name'].strip()
+        phone = request.form['phone'].strip()
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        # Validation
+        if not all([name, phone, password, confirm_password]):
+            flash("All fields are required!")
+            return render_template('register.html')
         
+        if password != confirm_password:
+            flash("Passwords do not match!")
+            return render_template('register.html')
+
+        if not re.match(r'^\d{10}$', phone):
+            flash("Please enter a valid 10-digit phone number!")
+            return render_template('register.html')
+
+        if len(password) < 6:
+            flash("Password must be at least 6 characters long!")
+            return render_template('register.html')
+
+        # Check if phone number already exists
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("INSERT INTO users (name, phone, password) VALUES (?, ?, ?)", (name, phone, password))
-        conn.commit()
-        conn.close()
-        
-        flash("Registration successful! Please login.")
-        return redirect(url_for('login'))
+        cur.execute("SELECT id FROM users WHERE phone=?", (phone,))
+        if cur.fetchone():
+            conn.close()
+            flash("Phone number already registered!")
+            return render_template('register.html')
+
+        # Hash password and save user
+        hashed_password = generate_password_hash(password)
+        try:
+            cur.execute("INSERT INTO users (name, phone, password) VALUES (?, ?, ?)", 
+                       (name, phone, hashed_password))
+            conn.commit()
+            conn.close()
+            flash("Registration successful! Please login.")
+            return redirect(url_for('login'))
+        except:
+            conn.close()
+            flash("An error occurred. Please try again.")
+            return render_template('register.html')
     return render_template('register.html')
 
 # Login Route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        phone = request.form['phone']
+        phone = request.form['phone'].strip()
         password = request.form['password']
-        
+
+        if not phone or not password:
+            flash("Please enter both phone and password!")
+            return render_template('login.html')
+
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE phone=? AND password=?", (phone, password))
+        cur.execute("SELECT * FROM users WHERE phone=?", (phone,))
         user = cur.fetchone()
         conn.close()
 
-        if user:
+        if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['name'] = user['name']
             return redirect(url_for('dashboard'))
         else:
-            flash("Invalid credentials!")
+            flash("Invalid phone number or password!")
+
     return render_template('login.html')
 
 # Dashboard Route
@@ -148,12 +283,12 @@ def download_file(filename):
         flash("File not found or unauthorized.")
         return redirect(url_for('records'))
 
-# Symptom Checker Route (corrected)
+# Symptom Checker Route
 @app.route('/symptom_checker', methods=['GET', 'POST'])
 def symptom_checker():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
+
     advice = None
     if request.method == 'POST':
         symptom = request.form['symptom']
@@ -327,10 +462,7 @@ def generate_diet_plan(trimester, condition, diet_type, culture):
 
     return diet
 
-
-# Book Appointment
-
-
+# Book Appointment Route
 @app.route('/book_appointment', methods=['GET', 'POST'])
 def book_appointment():
     if 'user_id' not in session:
@@ -375,7 +507,7 @@ def book_appointment():
 
     return render_template('book_appointment.html', specializations=specializations, hospitals=hospitals)
 
-# View Appointments
+# View Appointments Route
 @app.route('/appointments')
 def appointments():
     if 'user_id' not in session:
@@ -393,12 +525,12 @@ def appointments():
 
     return render_template('appointments.html', appointments=appointments)
 
-# Logout
+# Logout Route
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home'))
 
-# Run the App
 if __name__ == '__main__':
+    migrate_db()
     app.run(debug=True)

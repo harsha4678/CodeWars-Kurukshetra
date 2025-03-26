@@ -1,9 +1,400 @@
-<h2>Symptom Checker</h2>
-<form method="POST">
-    Symptom: <input type="text" name="symptom" required>
-    <button type="submit">Check Advice</button>
-</form>
+{% extends "base.html" %}
 
-{% if advice %}
-    <p><strong>Advice:</strong> {{ advice }}</p>
-{% endif %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Symptom Checker - Pregnancy Health Care</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h2 {
+            color: #1a56db;
+            font-weight: 600;
+            font-size: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .intro-text {
+            text-align: center;
+            color: #4b5563;
+            margin-bottom: 20px;
+            font-size: 14px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+        .chat-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .chat-header {
+            padding: 12px 16px;
+            background-color: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .assistant-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1a56db;
+            font-weight: 500;
+        }
+        .heart-icon {
+            color: #1a56db;
+        }
+        .clear-chat-btn {
+            font-size: 12px;
+            color: #4b5563;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .chat-messages {
+            padding: 20px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .assistant-message h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .assistant-message p {
+            color: #4b5563;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .symptom-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .symptom-option {
+            background-color: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .symptom-option:hover {
+            background-color: #e5e7eb;
+        }
+        .chat-input {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 24px;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+        .chat-input input:focus {
+            border-color: #1a56db;
+        }
+        .send-btn {
+            background-color: #1a56db;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .medical-disclaimer {
+            background-color: #fff3cd;
+            border-left: 4px solid #fbbf24;
+            padding: 12px 16px;
+            margin-top: 24px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #92400e;
+        }
+        .medical-disclaimer strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #1a56db;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to {transform: rotate(360deg);}
+        }
+        .back-btn {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            background: var(--primary-color, #1a56db);
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: var(--secondary-color, #3f37c9);
+            transform: translateY(-2px);
+        }
+
+        .back-btn i {
+            margin-right: 5px;
+        }
+
+        .google-translate {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="google_translate_element" class="google-translate"></div>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'hi,bn,te,mr,ta,gu,kn,ml,pa,ur',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <div class="container">
+        <a href="/dashboard" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+        <h2>Pregnancy Symptom Checker</h2>
+        <p class="intro-text">Chat with our AI medical assistant about your pregnancy symptoms. Get information, potential causes, and general guidance about what you're experiencing.</p>
+        
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="assistant-indicator">
+                    <span class="heart-icon">❤️</span>
+                    AI Medical Assistant
+                </div>
+                <button class="clear-chat-btn" onclick="clearChat()">Clear chat</button>
+            </div>
+            
+            <div class="chat-messages">
+                <div class="message assistant-message">
+                    <h3>Hello! I'm your Pregnancy Health Assistant</h3>
+                    <p>I can provide information about pregnancy symptoms, potential causes, and general guidance. What symptoms are you experiencing?</p>
+                    
+                    <div class="symptom-options">
+                        <button class="symptom-option" onclick="selectSymptom('Morning sickness throughout the day')">Morning sickness throughout the day</button>
+                        <button class="symptom-option" onclick="selectSymptom('Back pain during the night')">Back pain during the night</button>
+                        <button class="symptom-option" onclick="selectSymptom('Swelling in ankles')">Swelling in ankles</button>
+                        <button class="symptom-option" onclick="selectSymptom('Dizziness when standing up')">Dizziness when standing up</button>
+                    </div>
+                </div>
+                <!-- Dynamic chat messages will be inserted here -->
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <p>Analyzing your symptoms...</p>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="symptom-input" placeholder="Describe your symptoms..." onkeypress="checkEnter(event)">
+                <button class="send-btn" onclick="sendSymptom()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="medical-disclaimer">
+            <strong>Medical Disclaimer</strong>
+            This tool provides general information only and should not replace professional medical advice. Always consult with your healthcare provider for personalized guidance.
+        </div>
+    </div>
+    
+    <script>
+        function selectSymptom(symptom) {
+            addUserMessage(symptom);
+            getAIResponse(symptom);
+        }
+        
+        function sendSymptom() {
+            const input = document.getElementById('symptom-input');
+            const symptom = input.value.trim();
+            
+            if (symptom) {
+                addUserMessage(symptom);
+                input.value = '';
+                getAIResponse(symptom);
+            }
+        }
+        
+        function getAIResponse(symptom) {
+            const loadingIndicator = document.querySelector('.loading-indicator');
+            loadingIndicator.style.display = 'block';
+            
+            fetch('/symptom_checker', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `symptom=${encodeURIComponent(symptom)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                addAssistantMessage(data.response);
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                addAssistantMessage(`
+                    <div style="color: #dc2626; padding: 15px; background: #fee2e2; border-radius: 8px;">
+                        ⚠️ Sorry, I couldn't process your request. Please try again later or contact your healthcare provider.
+                        <br>Error: ${error.message}
+                    </div>
+                `);
+                console.error('Error:', error);
+            });
+        }
+        
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                sendSymptom();
+            }
+        }
+        
+        function addUserMessage(message) {
+            const chatMessages = document.querySelector('.chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message user-message';
+            messageDiv.style.textAlign = 'right';
+            messageDiv.style.marginBottom = '16px';
+            
+            const messageBubble = document.createElement('span');
+            messageBubble.style.backgroundColor = '#e9f3ff';
+            messageBubble.style.padding = '8px 16px';
+            messageBubble.style.borderRadius = '18px';
+            messageBubble.style.display = 'inline-block';
+            messageBubble.style.maxWidth = '80%';
+            messageBubble.style.textAlign = 'left';
+            messageBubble.textContent = message;
+            
+            messageDiv.appendChild(messageBubble);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function addAssistantMessage(message) {
+            const chatMessages = document.querySelector('.chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant-message';
+            messageDiv.innerHTML = message;
+            
+            // Add follow-up options after the message
+            const followUpDiv = document.createElement('div');
+            followUpDiv.className = 'symptom-options';
+            followUpDiv.innerHTML = `
+                <button class="symptom-option" onclick="selectSymptom('Tell me more about this')">Tell me more</button>
+                <button class="symptom-option" onclick="selectSymptom('What are the warning signs?')">Warning signs</button>
+                <button class="symptom-option" onclick="selectSymptom('How can I relieve this?')">Relief options</button>
+            `;
+            
+            messageDiv.appendChild(followUpDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function clearChat() {
+            fetch('/clear_chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const chatMessages = document.querySelector('.chat-messages');
+                    chatMessages.innerHTML = `
+                        <div class="message assistant-message">
+                            <h3>Hello! I'm your Pregnancy Health Assistant</h3>
+                            <p>I can provide information about pregnancy symptoms, potential causes, and general guidance. What symptoms are you experiencing?</p>
+                            
+                            <div class="symptom-options">
+                                <button class="symptom-option" onclick="selectSymptom('Morning sickness throughout the day')">Morning sickness throughout the day</button>
+                                <button class="symptom-option" onclick="selectSymptom('Back pain during the night')">Back pain during the night</button>
+                                <button class="symptom-option" onclick="selectSymptom('Swelling in ankles')">Swelling in ankles</button>
+                                <button class="symptom-option" onclick="selectSymptom('Dizziness when standing up')">Dizziness when standing up</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing chat:', error);
+            });
+        }
+    </script>
+
+    
+</body>
+</html>
+{% endblock %}

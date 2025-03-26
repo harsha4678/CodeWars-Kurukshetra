@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Uploaded Records</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .records-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .records-header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .records-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            position: relative;
+        }
+        
+        .records-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .btn {
+            display: inline-block;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            border-radius: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            color: white;
+            background-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .records-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+        
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-text {
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+        
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .records-table th {
+            background-color: #f8f9fa;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #444;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .records-table td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        
+        .records-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .records-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+        
+        .file-icon {
+            font-size: 22px;
+            color: #666;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        .file-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-type {
+            display: inline-block;
+            font-size: 12px;
+            color: #666;
+            background-color: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .download-btn:hover {
+            background-color: rgba(67, 97, 238, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .download-icon {
+            margin-right: 8px;
+        }
+        
+        .record-date {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .records-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .records-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .records-header .btn {
+                margin-top: 20px;
+            }
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            color: #666;
+            text-decoration: none;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+        
+        .btn-back:hover {
+            color: var(--primary);
+        }
+        
+        .back-icon {
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="records-container">
+        <a href="{{ url_for('dashboard') }}" class="btn-back">
+            <span class="back-icon">←</span> Back to Dashboard
+        </a>
+        
+        <div class="records-header">
+            <h1 class="records-title">Your Uploaded Records</h1>
+            
+        </div>
+        
+        <div class="records-card">
+            {% if records %}
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Upload Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td class="file-name">
+                            {% if record['file_name'].endswith('.pdf') %}
+                                <span class="file-icon">📄</span>
+                            {% elif record['file_name'].endswith(('.jpg', '.jpeg', '.png')) %}
+                                <span class="file-icon">🖼️</span>
+                            {% elif record['file_name'].endswith('.docx') %}
+                                <span class="file-icon">📝</span>
+                            {% else %}
+                                <span class="file-icon">📋</span>
+                            {% endif %}
+                            
+                            {{ record['file_name'] }}
+                            
+                            {% if record['file_name'].endswith('.pdf') %}
+                                <span class="file-type">PDF</span>
+                            {% elif record['file_name'].endswith('.jpg') %}
+                                <span class="file-type">JPG</span>
+                            {% elif record['file_name'].endswith('.png') %}
+                                <span class="file-type">PNG</span>
+                            {% elif record['file_name'].endswith('.docx') %}
+                                <span class="file-type">DOCX</span>
+                            {% endif %}
+                        </td>
+                        <td class="record-date">{{ record['upload_date'] }}</td>
+                        <td>
+                            <a href="{{ url_for('download_file', filename=record['file_name']) }}" class="download-btn">
+                                <span class="download-icon">📥</span> Download
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📁</div>
+                <p class="empty-text">No records uploaded yet.</p>
+                <a href="#" class="btn btn-primary">Upload Your First Record</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+{% endblock %}
