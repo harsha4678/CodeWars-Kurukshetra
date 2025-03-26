@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregnancy Care Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c7be5;
+            --secondary-color: #5e9ad9;
+            --background-color: #f4f5f7;
+            --text-color: #12263f;
+            --card-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .dashboard-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .dashboard-header {
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .dashboard-subtitle {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--card-shadow);
+            border: 1px solid transparent;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+
+        .dashboard-card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .dashboard-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .image-section {
+            flex: 1;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .image-section img {
+            max-width: 80%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .image-text {
+            margin-top: 20px;
+            max-width: 500px;
+        }
+
+        .image-text h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .logout-btn {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-wrapper {
+                flex-direction: column;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .image-section {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <div class="dashboard-content">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Pregnancy Care Dashboard</h1>
+                <p class="dashboard-subtitle">Your Comprehensive Pregnancy Support Platform</p>
+            </div>
+
+            <div class="dashboard-grid">
+                <a href="{{ url_for('diet_plan') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">🥗</div>
+                    <h3 class="dashboard-card-title">Diet Plan</h3>
+                </a>
+
+                <a href="{{ url_for('records') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">📂</div>
+                    <h3 class="dashboard-card-title">Health Records</h3>
+                </a>
+
+                <a href="{{ url_for('upload_record') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">📤</div>
+                    <h3 class="dashboard-card-title">Upload Record</h3>
+                </a>
+
+                <a href="{{ url_for('symptom_checker') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">🩺</div>
+                    <h3 class="dashboard-card-title">Symptom Checker</h3>
+                </a>
+
+                <a href="{{ url_for('book_appointment') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">📅</div>
+                    <h3 class="dashboard-card-title">Book Appointment</h3>
+                </a>
+
+                <a href="{{ url_for('appointments') }}" class="dashboard-card">
+                    <div class="dashboard-card-icon">👩‍⚕️</div>
+                    <h3 class="dashboard-card-title">View Appointments</h3>
+                </a>
+            </div>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    
+    
+
+        <div class="image-section">
+            <img src="D:\Projects\PregnancyHealthCare\uploads\image.png" alt="Pregnancy Care" />
+            <div class="image-text">
+                <h2>Your Journey, Our Support</h2>
+                <p>We're here to guide you through every step of your pregnancy, providing personalized care, expert advice, and comprehensive support to ensure both you and your baby's health and well-being.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
