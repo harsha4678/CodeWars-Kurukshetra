@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="prescription-analyzer">
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+        
+        <div class="header">
+            <h1>MediScan Pro</h1>
+            <p>Intelligent Medical Prescription Analysis</p>
+        </div>
+
+        <div class="upload-section">
+            <form method="POST" enctype="multipart/form-data" class="upload-form" id="prescriptionForm">
+                <div class="drop-zone" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt drop-zone-icon"></i>
+                    <h3>Drop your prescription here</h3>
+                    <p>Supported formats: PDF, JPG, PNG</p>
+                    <button type="button" class="btn-browse btn-primary mt-3">Choose File</button>
+                    <input type="file" class="form-control d-none" id="prescription" name="prescription" 
+                           accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+                
+                <div class="selected-file mt-4 text-center d-none">
+                    <div class="file-info p-3 rounded-3 d-inline-block">
+                        <i class="fas fa-file-medical me-2"></i>
+                        <span class="file-name"></span>
+                        <button type="button" class="btn btn-link text-danger remove-file p-0 ms-3">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn-analyze btn-primary" id="analyzeBtn">
+                        <span class="btn-content">
+                            <i class="fas fa-search me-2"></i>
+                            Analyze Prescription
+                        </span>
+                        <div class="spinner d-none">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if analysis %}
+        <div class="results-section animate__animated animate__fadeInUp">
+            <div class="analysis-tabs">
+                <button class="tab active" data-target="analysis">Analysis</button>
+                <button class="tab" data-target="original">Original Text</button>
+            </div>
+            <div class="analysis-content">
+                <div id="analysis" class="tab-content active">
+                    {{ analysis | safe }}
+                </div>
+                <div id="original" class="tab-content">
+                    <pre>{{ original_text }}</pre>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #3A6EA5;
+        --secondary-color: #1E3F66;
+        --accent-color: #5BD1D7;
+        --background-light: #F4F7F6;
+        --background-dark: #1A2B3C;
+        --text-light: #2C3E50;
+        --text-dark: #ECF0F1;
+        --card-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        background: var(--background-light);
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+
+    body.dark-mode {
+        background: var(--background-dark);
+        color: var(--text-dark);
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .prescription-analyzer {
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .dark-mode .prescription-analyzer {
+        background: var(--secondary-color);
+        color: var(--text-dark);
+    }
+
+    .header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        letter-spacing: -1px;
+    }
+
+    .header p {
+        opacity: 0.8;
+    }
+
+    .upload-section {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .drop-zone {
+        border: 3px dashed var(--accent-color);
+        border-radius: 12px;
+        padding: 3rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .drop-zone:hover {
+        background: rgba(91, 209, 215, 0.05);
+        border-color: var(--primary-color);
+    }
+
+    .drop-zone-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .theme-toggle {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: white;
+        padding: 10px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .results-section {
+        margin-top: 2rem;
+        background: var(--background-light);
+        border-radius: 12px;
+        padding: 2rem;
+    }
+
+    .dark-mode .results-section {
+        background: var(--background-dark);
+    }
+
+    .analysis-tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .tab {
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        background: transparent;
+        color: var(--primary-color);
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+    }
+
+    .tab.active {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .analysis-content {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    /* Spinner Animation */
+    .spinner > div {
+        width: 8px;
+        height: 8px;
+        background-color: white;
+        border-radius: 100%;
+        display: inline-block;
+        animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .spinner .bounce1 { animation-delay: -0.32s; }
+    .spinner .bounce2 { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1.0); }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('prescription');
+    const form = document.getElementById('prescriptionForm');
+    const fileInfo = document.querySelector('.selected-file');
+    const themeToggle = document.getElementById('themeToggle');
+    const tabs = document.querySelectorAll('.tab');
+    
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone.addEventListener('drop', handleDrop);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        updateFileInfo(files[0]);
+    }
+
+    // File browse button
+    const browseBtns = document.querySelectorAll('.btn-browse');
+    browseBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            fileInput.click();
+        });
+    });
+
+    // File selection handling
+    fileInput.addEventListener('change', (e) => {
+        updateFileInfo(e.target.files[0]);
+    });
+
+    function updateFileInfo(file) {
+        if (file) {
+            const fileNameSpan = document.querySelector('.file-name');
+            fileNameSpan.textContent = file.name;
+            fileInfo.classList.remove('d-none');
+        }
+    }
+
+    // Remove file
+    document.querySelector('.remove-file').addEventListener('click', () => {
+        fileInput.value = '';
+        fileInfo.classList.add('d-none');
+    });
+
+    // Form submission
+    form.addEventListener('submit', (e) => {
+        const spinner = document.querySelector('.spinner');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        spinner.classList.remove('d-none');
+        analyzeBtn.disabled = true;
+    });
+
+    // Theme toggle
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const icon = themeToggle.querySelector('i');
+        icon.classList.toggle('fa-moon');
+        icon.classList.toggle('fa-sun');
+    });
+
+    // Tab functionality
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and tab contents
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            const targetId = tab.getAttribute('data-target');
+            document.getElementById(targetId).classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %}
